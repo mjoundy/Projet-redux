@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+let state = {
+  counter:3
+};
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const listeners = [];
+
+function subscribe(callback) {
+  listeners.push(callback);
 }
 
-export default App;
+function updateView() {
+  document.querySelector('#counter').innerText = state.counter;
+}
+
+function reducer(state, action) {
+  switch(action) {
+    case 'INC': return Object.assign({}, state, {counter: state.counter + 1});
+    case 'DEC': return Object.assign({}, state, {counter: state.counter - 1});
+    default: return state; 
+  }
+}
+
+function dispatch(action) {
+  const newState = reducer(state, action); // 3
+  
+  if (newState !== state) {
+    state = newState;
+    listeners.forEach(listener => listener());
+  }
+}
+
+
+//dispatch
+document.querySelector('#inc').onclick = () => dispatch('INC');
+document.querySelector('#dec').onclick = () => dispatch('DEC');
+
+
+//update
+updateView()
+subscribe(updateView)
